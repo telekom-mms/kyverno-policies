@@ -1,0 +1,6 @@
+.git
+.github
+.helmignore
+LICENSE
+README.md
+renovate.json
