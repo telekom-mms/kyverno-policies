@@ -1,4 +1,4 @@
-{{- if and (not (has "disallow-privileged-containers" .Values.excludePolicies)) (has "disallow-privileged-containers" .Values.includePolicies) }}
+{{- if has "disallow-privileged-containers" .Values.includePolicies }}
 ---
 apiVersion: policies.kyverno.io/v1
 kind: ValidatingPolicy
@@ -11,12 +11,12 @@ metadata:
     policies.kyverno.io/subject: Pod
 spec:
   validationActions:
-    - Audit
-
+    {{- range (.Values.policyPrivilegedContainers.validationActions) }}
+    - {{ . }}
+    {{- end }}
   evaluation:
     background:
       enabled: true
-
   matchConstraints:
     resourceRules:
       - apiGroups:
@@ -28,7 +28,24 @@ spec:
           - UPDATE
         resources:
           - pods
-
+    {{- if .Values.policyPrivilegedContainers.excludedNamespaces }}
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            {{- toYaml .Values.policyPrivilegedContainers.excludedNamespaces | nindent 12 }}
+    {{- end }}
+    {{- if .Values.policyPrivilegedContainers.excludedLabels }}
+    objectSelector:
+      matchExpressions:
+      {{- range $key, $val := .Values.policyPrivilegedContainers.excludedLabels }}
+        - key: {{ $key }}
+          operator: NotIn
+          values:
+            - {{ $val | quote }}
+      {{- end }}
+    {{- end }}
   validations:
     - expression: >-
         object.spec.containers.all(c,

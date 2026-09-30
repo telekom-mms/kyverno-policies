@@ -1,4 +1,4 @@
-{{- if and (not (has "disallow-privilege-escalation" .Values.excludePolicies)) (has "disallow-privilege-escalation" .Values.includePolicies) }}
+{{- if has "disallow-privilege-escalation" .Values.includePolicies }}
 ---
 apiVersion: policies.kyverno.io/v1
 kind: ValidatingPolicy
@@ -11,12 +11,12 @@ metadata:
     policies.kyverno.io/subject: Pod
 spec:
   validationActions:
-    - Audit
-
+    {{- range (.Values.policyPrivilegeEscalation.validationActions) }}
+    - {{ . }}
+    {{- end }}
   evaluation:
     background:
       enabled: true
-
   matchConstraints:
     resourceRules:
       - apiGroups:
@@ -28,7 +28,24 @@ spec:
           - UPDATE
         resources:
           - pods
-
+    {{- if .Values.policyPrivilegeEscalation.excludedNamespaces }}
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            {{- toYaml .Values.policyPrivilegeEscalation.excludedNamespaces | nindent 12 }}
+    {{- end }}
+    {{- if .Values.policyPrivilegeEscalation.excludedLabels }}
+    objectSelector:
+      matchExpressions:
+      {{- range $key, $val := .Values.policyPrivilegeEscalation.excludedLabels }}
+        - key: {{ $key }}
+          operator: NotIn
+          values:
+            - {{ $val | quote }}
+      {{- end }}
+    {{- end }}
   validations:
     - expression: >-
         object.spec.containers.all(c,

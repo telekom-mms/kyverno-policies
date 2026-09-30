@@ -23,6 +23,16 @@ includePolicies:
   - disallow-privilege-escalation
   - disallow-privileged-containers
   - require-drop-all
+
+policyRunAsNonRoot:
+  validationActions:
+    - Audit
+  excludedNamespaces:
+    - kube-system
+    - my-legacy-namespace
+  excludedLabels:
+    exclude-from-policy: "true"
+    allow-root: "yes"
 ```
 
 ## Currently available policies

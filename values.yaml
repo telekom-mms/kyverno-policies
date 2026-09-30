@@ -8,4 +8,62 @@ includePolicies: []
 #   - disallow-privileged-containers
 #   - require-drop-all
 
-excludePolicies: []
+policyRunAsNonRoot:
+  validationActions:
+    - Audit
+  excludedNamespaces: []
+  # excludedNamespaces:
+  #   - kube-system
+  #   - my-legacy-namespace
+  excludedLabels:
+  # excludedLabels:
+  #   exclude-from-policy: "true"
+  #   allow-root: "yes"
+
+policyRoRootfs:
+  validationActions:
+    - Audit
+  excludedNamespaces: []
+  # excludedNamespaces:
+  #   - kube-system
+  #   - my-legacy-namespace
+  excludedLabels:
+  # excludedLabels:
+  #   exclude-from-policy: "true"
+  #   allow-root: "yes"
+
+policyDropAll:
+  validationActions:
+    - Audit
+  excludedNamespaces: []
+  # excludedNamespaces:
+  #   - kube-system
+  #   - my-legacy-namespace
+  excludedLabels:
+  # excludedLabels:
+  #   exclude-from-policy: "true"
+  #   allow-root: "yes"
+
+policyPrivilegeEscalation:
+  validationActions:
+    - Audit
+  excludedNamespaces: []
+  # excludedNamespaces:
+  #   - kube-system
+  #   - my-legacy-namespace
+  excludedLabels:
+  # excludedLabels:
+  #   exclude-from-policy: "true"
+  #   allow-root: "yes"
+
+policyPrivilegedContainers:
+  validationActions:
+    - Audit
+  excludedNamespaces: []
+  # excludedNamespaces:
+  #   - kube-system
+  #   - my-legacy-namespace
+  excludedLabels:
+  # excludedLabels:
+  #   exclude-from-policy: "true"
+  #   allow-root: "yes"
