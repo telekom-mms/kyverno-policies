@@ -1,40 +1,40 @@
 {{- if or (not (has "disallow-privileged-containers" .Values.excludePolicies)) (has "disallow-privileged-containers" .Values.includePolicies) }}
 ---
-- apiVersion: policies.kyverno.io/v1
-  kind: ValidatingPolicy
-  metadata:
-    name: disallow-privileged-containers
-    annotations:
-      policies.kyverno.io/title: Disallow Privileged Containers
-      policies.kyverno.io/category: Pod Security
-      policies.kyverno.io/severity: high
-      policies.kyverno.io/subject: Pod
-  spec:
-    validationActions:
-      - Audit
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: disallow-privileged-containers
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Containers
+    policies.kyverno.io/category: Pod Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+spec:
+  validationActions:
+    - Audit
 
-    evaluation:
-      background:
-        enabled: true
+  evaluation:
+    background:
+      enabled: true
 
-    matchConstraints:
-      resourceRules:
-        - apiGroups:
-            - ""
-          apiVersions:
-            - v1
-          operations:
-            - CREATE
-            - UPDATE
-          resources:
-            - pods
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
 
-    validations:
-      - expression: >-
-          object.spec.containers.all(c,
-            !has(c.securityContext) ||
-            !has(c.securityContext.privileged) ||
-            c.securityContext.privileged != true
-          )
-        message: "Privileged containers are not allowed."
+  validations:
+    - expression: >-
+        object.spec.containers.all(c,
+          !has(c.securityContext) ||
+          !has(c.securityContext.privileged) ||
+          c.securityContext.privileged != true
+        )
+      message: "Privileged containers are not allowed."
 {{- end }}
