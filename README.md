@@ -11,4 +11,18 @@ helm upgrade --install kyverno-policies kyverno-policies/kyverno-policies \
   --namespace [your namespace]
 ```
 
+## Configure
+
+Example `values.yaml`
+```yaml
+---
+
+includePolicies:
+  - require-ro-rootfs
+  - require-run-as-non-root
+  - disallow-privilege-escalation
+  - disallow-privileged-containers
+  - require-drop-all
+```
+
 Enable GitHub Pages in the GitHub repository settings with **GitHub Actions** as the build and deployment source. The chart repository becomes available after the next non-prerelease `v*` release. Run `helm repo update` before upgrades to discover newer charts; omit `--version` to select the latest stable chart. For a fixed deployment, set `--version` on the Helm command.
