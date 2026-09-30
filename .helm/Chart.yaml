@@ -1,0 +1,7 @@
+---
+
+apiVersion: v2
+name: kyverno-policies
+description: A collection of useful kyverno-policies
+version: 0.1.0
+appVersion: "1.0.0"

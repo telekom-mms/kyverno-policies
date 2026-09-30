@@ -1,0 +1,11 @@
+---
+
+includePolicies: []
+# includePolicies:
+#   - require-ro-rootfs
+#   - require-run-as-non-root
+#   - disallow-privilege-escalation
+#   - disallow-privileged-containers
+#   - require-drop-all
+
+excludePolicies: []

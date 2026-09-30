@@ -1,0 +1,38 @@
+{{- if or (not (has "require-run-as-non-root" .Values.excludePolicies)) (has "require-run-as-non-root" .Values.includePolicies) }}
+---
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-run-as-non-root
+  annotations:
+    policies.kyverno.io/title: Require Run As Non Root
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+spec:
+  validationActions:
+    - Audit
+
+  evaluation:
+    background:
+      enabled: true
+
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+
+  validations:
+    - expression: >-
+        has(object.spec.securityContext) &&
+        has(object.spec.securityContext.runAsNonRoot) &&
+        object.spec.securityContext.runAsNonRoot == true
+      message: "Pod must set securityContext.runAsNonRoot to true."
+{{- end }}

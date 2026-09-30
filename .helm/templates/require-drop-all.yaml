@@ -1,0 +1,41 @@
+{{- if or (not (has "require-drop-all" .Values.excludePolicies)) (has "require-drop-all" .Values.includePolicies) }}
+---
+- apiVersion: policies.kyverno.io/v1
+  kind: ValidatingPolicy
+  metadata:
+    name: require-drop-all
+    annotations:
+      policies.kyverno.io/title: Require Drop All Capabilities
+      policies.kyverno.io/category: Pod Security
+      policies.kyverno.io/severity: high
+      policies.kyverno.io/subject: Pod
+  spec:
+    validationActions:
+      - Audit
+
+    evaluation:
+      background:
+        enabled: true
+
+    matchConstraints:
+      resourceRules:
+        - apiGroups:
+            - ""
+          apiVersions:
+            - v1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - pods
+
+    validations:
+      - expression: >-
+          object.spec.containers.all(c,
+            has(c.securityContext) &&
+            has(c.securityContext.capabilities) &&
+            has(c.securityContext.capabilities.drop) &&
+            "ALL" in c.securityContext.capabilities.drop
+          )
+        message: "All containers must drop all Linux capabilities."
+{{- end }}
