@@ -25,4 +25,11 @@ includePolicies:
   - require-drop-all
 ```
 
+## Currently available policies
+* disallow-privilege-escalation
+* disallow-privileged-containers.yaml
+* require-drop-all.yaml
+* require-ro-rootfs.yaml
+* require-run-as-non-root.yaml
+
 Enable GitHub Pages in the GitHub repository settings with **GitHub Actions** as the build and deployment source. The chart repository becomes available after the next non-prerelease `v*` release. Run `helm repo update` before upgrades to discover newer charts; omit `--version` to select the latest stable chart. For a fixed deployment, set `--version` on the Helm command.
