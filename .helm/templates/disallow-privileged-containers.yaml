@@ -1,4 +1,4 @@
-{{- if or (not (has "disallow-privileged-containers" .Values.excludePolicies)) (has "disallow-privileged-containers" .Values.includePolicies) }}
+{{- if and (not (has "disallow-privileged-containers" .Values.excludePolicies)) (has "disallow-privileged-containers" .Values.includePolicies) }}
 ---
 apiVersion: policies.kyverno.io/v1
 kind: ValidatingPolicy

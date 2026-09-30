@@ -1,4 +1,4 @@
-{{- if or (not (has "require-drop-all" .Values.excludePolicies)) (has "require-drop-all" .Values.includePolicies) }}
+{{- if and (not (has "require-drop-all" .Values.excludePolicies)) (has "require-drop-all" .Values.includePolicies) }}
 ---
 apiVersion: policies.kyverno.io/v1
 kind: ValidatingPolicy

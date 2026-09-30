@@ -1,4 +1,4 @@
-{{- if or (not (has "require-run-as-non-root" .Values.excludePolicies)) (has "require-run-as-non-root" .Values.includePolicies) }}
+{{- if and (not (has "require-run-as-non-root" .Values.excludePolicies)) (has "require-run-as-non-root" .Values.includePolicies) }}
 ---
 apiVersion: policies.kyverno.io/v1
 kind: ValidatingPolicy

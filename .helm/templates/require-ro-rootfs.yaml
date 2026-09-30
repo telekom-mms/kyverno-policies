@@ -1,4 +1,4 @@
-{{- if or (not (has "require-ro-rootfs" .Values.excludePolicies)) (has "require-ro-rootfs" .Values.includePolicies) }}
+{{- if and (not (has "require-ro-rootfs" .Values.excludePolicies)) (has "require-ro-rootfs" .Values.includePolicies) }}
 ---
 apiVersion: policies.kyverno.io/v1
 kind: ValidatingPolicy

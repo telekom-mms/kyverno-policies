@@ -1,4 +1,4 @@
-{{- if or (not (has "disallow-privilege-escalation" .Values.excludePolicies)) (has "disallow-privilege-escalation" .Values.includePolicies) }}
+{{- if and (not (has "disallow-privilege-escalation" .Values.excludePolicies)) (has "disallow-privilege-escalation" .Values.includePolicies) }}
 ---
 apiVersion: policies.kyverno.io/v1
 kind: ValidatingPolicy
