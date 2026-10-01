@@ -20,6 +20,7 @@ policyRunAsNonRoot:
   # excludedLabels:
   #   exclude-from-policy: "true"
   #   allow-root: "yes"
+  # background: false
 
 policyRoRootfs:
   validationActions:
@@ -32,6 +33,7 @@ policyRoRootfs:
   # excludedLabels:
   #   exclude-from-policy: "true"
   #   allow-root: "yes"
+  # background: false
 
 policyDropAll:
   validationActions:
@@ -44,6 +46,7 @@ policyDropAll:
   # excludedLabels:
   #   exclude-from-policy: "true"
   #   allow-root: "yes"
+  # background: false
 
 policyPrivilegeEscalation:
   validationActions:
@@ -56,6 +59,7 @@ policyPrivilegeEscalation:
   # excludedLabels:
   #   exclude-from-policy: "true"
   #   allow-root: "yes"
+  # background: false
 
 policyPrivilegedContainers:
   validationActions:
@@ -68,6 +72,7 @@ policyPrivilegedContainers:
   # excludedLabels:
   #   exclude-from-policy: "true"
   #   allow-root: "yes"
+  # background: false
 
 policyRequestsLimits:
   validationActions:
@@ -80,3 +85,4 @@ policyRequestsLimits:
   # excludedLabels:
   #   exclude-from-policy: "true"
   #   allow-root: "yes"
+  # background: false

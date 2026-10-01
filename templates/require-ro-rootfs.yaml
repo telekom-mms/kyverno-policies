@@ -17,7 +17,7 @@ spec:
     {{- end }}
   evaluation:
     background:
-      enabled: true
+      enabled: {{ if hasKey .Values.policyRoRootfs "background" }}{{ .Values.policyRoRootfs.background }}{{ else }}true{{ end }}
   matchConstraints:
     resourceRules:
       - apiGroups:

@@ -26,7 +26,7 @@ spec:
     {{- end }}
   evaluation:
     background:
-      enabled: true
+      enabled: {{ if hasKey .Values.policyRequestsLimits "background" }}{{ .Values.policyRequestsLimits.background }}{{ else }}true{{ end }}
   matchConstraints:
     resourceRules:
       - apiGroups:

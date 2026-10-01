@@ -17,7 +17,7 @@ spec:
     {{- end }}
   evaluation:
     background:
-      enabled: true
+      enabled: {{ if hasKey .Values.policyRunAsNonRoot "background" }}{{ .Values.policyRunAsNonRoot.background }}{{ else }}true{{ end }}
   matchConstraints:
     resourceRules:
       - apiGroups:

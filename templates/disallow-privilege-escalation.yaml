@@ -17,7 +17,7 @@ spec:
     {{- end }}
   evaluation:
     background:
-      enabled: true
+      enabled: {{ if hasKey .Values.policyPrivilegeEscalation "background" }}{{ .Values.policyPrivilegeEscalation.background }}{{ else }}true{{ end }}
   matchConstraints:
     resourceRules:
       - apiGroups:
