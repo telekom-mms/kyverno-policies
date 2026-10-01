@@ -7,6 +7,7 @@ includePolicies: []
 #   - disallow-privilege-escalation
 #   - disallow-privileged-containers
 #   - require-drop-all
+#   - require-requests-limits
 
 policyRunAsNonRoot:
   validationActions:
@@ -57,6 +58,18 @@ policyPrivilegeEscalation:
   #   allow-root: "yes"
 
 policyPrivilegedContainers:
+  validationActions:
+    - Audit
+  excludedNamespaces: []
+  # excludedNamespaces:
+  #   - kube-system
+  #   - my-legacy-namespace
+  excludedLabels:
+  # excludedLabels:
+  #   exclude-from-policy: "true"
+  #   allow-root: "yes"
+
+policyRequestsLimits:
   validationActions:
     - Audit
   excludedNamespaces: []
