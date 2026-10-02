@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: azure/setup-helm@v4.3.1
         with:
-          version: v3.22.0
+          version: v4.3.0
       - run: helm lint ./
       - run: helm template ${{ github.event.repository.name }} ./ > /dev/null
 
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: azure/setup-helm@v4.3.1
         with:
-          version: v3.22.0
+          version: v4.3.0
       - run: helm package ./ --version "${GITHUB_REF_NAME#v}" --app-version "${GITHUB_REF_NAME#v}" --destination dist
       - run: cp dist/${{ github.event.repository.name }}-*.tgz dist/${{ github.event.repository.name }}.tgz
       - run: gh release create "$GITHUB_REF_NAME" dist/*.tgz --generate-notes
@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: azure/setup-helm@v4.3.1
         with:
-          version: v3.22.0
+          version: v4.3.0
       - run: |
           mkdir -p site/charts
           gh api --paginate "repos/${GITHUB_REPOSITORY}/releases?per_page=100" --jq '.[] | select(.draft == false and .prerelease == false) | .tag_name' |
