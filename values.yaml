@@ -8,8 +8,10 @@ includePolicies: []
 #   - disallow-privileged-containers
 #   - require-drop-all
 #   - require-requests-limits
+#   - disallow-latest-tag
 
 policyRunAsNonRoot:
+  # Audit, Warn, Enforce
   validationActions:
     - Audit
   excludedNamespaces: []
@@ -23,6 +25,7 @@ policyRunAsNonRoot:
   # background: false
 
 policyRoRootfs:
+  # Audit, Warn, Enforce
   validationActions:
     - Audit
   excludedNamespaces: []
@@ -36,6 +39,7 @@ policyRoRootfs:
   # background: false
 
 policyDropAll:
+  # Audit, Warn, Enforce
   validationActions:
     - Audit
   excludedNamespaces: []
@@ -49,6 +53,7 @@ policyDropAll:
   # background: false
 
 policyPrivilegeEscalation:
+  # Audit, Warn, Enforce
   validationActions:
     - Audit
   excludedNamespaces: []
@@ -62,6 +67,7 @@ policyPrivilegeEscalation:
   # background: false
 
 policyPrivilegedContainers:
+  # Audit, Warn, Enforce
   validationActions:
     - Audit
   excludedNamespaces: []
@@ -75,6 +81,21 @@ policyPrivilegedContainers:
   # background: false
 
 policyRequestsLimits:
+  # Audit, Warn, Enforce
+  validationActions:
+    - Audit
+  excludedNamespaces: []
+  # excludedNamespaces:
+  #   - kube-system
+  #   - my-legacy-namespace
+  excludedLabels:
+  # excludedLabels:
+  #   exclude-from-policy: "true"
+  #   allow-root: "yes"
+  # background: false
+
+policyDisallowLatestTag:
+  # Audit, Warn, Enforce
   validationActions:
     - Audit
   excludedNamespaces: []
