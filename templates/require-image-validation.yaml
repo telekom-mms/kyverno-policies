@@ -1,0 +1,105 @@
+{{- if has "require-image-validation" .Values.includePolicies }}
+---
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
+metadata:
+  name: require-image-validation
+  annotations:
+    policies.kyverno.io/title: Require Image Validation
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/minversion: 1.18.0
+spec:
+  validationActions:
+    {{- range (.Values.policyImageValidation.validationActions) }}
+    - {{ . }}
+    {{- end }}
+  evaluation:
+    background:
+      enabled: {{ if hasKey .Values.policyImageValidation "background" }}{{ .Values.policyImageValidation.background }}{{ else }}true{{ end }}
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+    {{- if .Values.policyImageValidation.excludedNamespaces }}
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            {{- toYaml .Values.policyImageValidation.excludedNamespaces | nindent 12 }}
+    {{- end }}
+    {{- if .Values.policyImageValidation.excludedLabels }}
+    objectSelector:
+      matchExpressions:
+      {{- range $key, $val := .Values.policyImageValidation.excludedLabels }}
+        - key: {{ $key }}
+          operator: NotIn
+          values:
+            - {{ $val | quote }}
+      {{- end }}
+    {{- end }}
+
+  matchImageReferences:
+  {{- range (.Values.policyImageValidation.matchImageReferences) }}
+    - {{ . }}
+  {{- end }}
+
+  matchConditions:
+    - name: cosign-verification-enabled
+      expression: >-
+        has(object.metadata.annotations) &&
+        {{ .Values.policyImageValidation.cosign.annotations.verify | quote }}
+          in object.metadata.annotations &&
+        object.metadata.annotations[
+          {{ .Values.policyImageValidation.cosign.annotations.verify | quote }}
+        ] == "true"
+
+  variables:
+    - name: signingKeyConfigName
+      expression: >-
+        has(object.metadata.annotations) &&
+        {{ .Values.policyImageValidation.cosign.annotations.keyConfigMap | quote }}
+          in object.metadata.annotations &&
+        object.metadata.annotations[
+          {{ .Values.policyImageValidation.cosign.annotations.keyConfigMap | quote }}
+        ] in {{ .Values.policyImageValidation.cosign.allowedKeyConfigMaps | toJson }}
+        ? object.metadata.annotations[
+            {{ .Values.policyImageValidation.cosign.annotations.keyConfigMap | quote }}
+          ]
+        : {{ .Values.policyImageValidation.cosign.defaultKeyConfigMap | quote }}
+
+    - name: signingKeyConfig
+      expression: >-
+        resource.Get(
+          "v1",
+          "configmaps",
+          object.metadata.namespace,
+          variables.signingKeyConfigName
+        )
+
+  attestors:
+    - name: cosign
+      cosign:
+        key:
+          expression: variables.signingKeyConfig.data.pubKey
+
+  validations:
+    - expression: >-
+        images.containers
+          .map(image,
+            verifyImageSignatures(image, [attestors.cosign])
+          )
+          .all(result, result > 0)
+      message: >-
+        Container image signature verification failed.
+        The image must be signed with an approved Cosign public key.
+{{- end }}
