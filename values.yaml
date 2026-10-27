@@ -110,6 +110,8 @@ policyDisallowLatestTag:
   # background: false
 
 policyImageValidation:
+  # if namespaced: true, this policy needs to be deployed within the target namespace
+  namespaced: false
   # Audit, Warn, Enforce
   validationActions:
     - Audit

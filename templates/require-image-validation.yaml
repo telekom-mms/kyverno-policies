@@ -1,7 +1,7 @@
 {{- if has "require-image-validation" .Values.includePolicies }}
 ---
 apiVersion: policies.kyverno.io/v1
-kind: ImageValidatingPolicy
+kind: {{ if .Values.policyImageValidation.namespaced }}NamespacedImageValidatingPolicy{{ else }}ImageValidatingPolicy{{ end }}
 metadata:
   name: require-image-validation
   annotations:
@@ -29,7 +29,7 @@ spec:
           - UPDATE
         resources:
           - pods
-    {{- if .Values.policyImageValidation.excludedNamespaces }}
+    {{- if and (not .Values.policyImageValidation.namespaced) .Values.policyImageValidation.excludedNamespaces }}
     namespaceSelector:
       matchExpressions:
         - key: kubernetes.io/metadata.name
