@@ -9,7 +9,7 @@ includePolicies: []
 #   - require-drop-all
 #   - require-requests-limits
 #   - disallow-latest-tag
-#   - require-image-validation
+#   - require-verify-image-signatures
 
 policyRunAsNonRoot:
   # Audit, Warn, Enforce

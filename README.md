@@ -25,7 +25,7 @@ includePolicies:
   - require-drop-all
   - require-requests-limits
   - disallow-latest-tag
-  - require-image-validation
+  - require-verify-image-signatures
 
 policyRunAsNonRoot:
   validationActions:
@@ -44,7 +44,7 @@ policyRunAsNonRoot:
 * disallow-privilege-escalation
 * disallow-privileged-containers
 * require-drop-all
-* require-image-validation
+* require-verify-image-signatures
 * require-requests-limits
 * require-ro-rootfs
 * require-run-as-non-root

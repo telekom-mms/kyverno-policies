@@ -1,9 +1,9 @@
-{{- if has "require-image-validation" .Values.includePolicies }}
+{{- if has "require-verify-image-signatures" .Values.includePolicies }}
 ---
 apiVersion: policies.kyverno.io/v1
 kind: {{ if .Values.policyImageValidation.namespaced }}NamespacedImageValidatingPolicy{{ else }}ImageValidatingPolicy{{ end }}
 metadata:
-  name: require-image-validation
+  name: require-verify-image-signatures
   annotations:
     policies.kyverno.io/title: Require Image Validation
     policies.kyverno.io/category: Best Practices
