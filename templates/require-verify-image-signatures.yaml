@@ -1,7 +1,7 @@
 {{- if has "require-verify-image-signatures" .Values.includePolicies }}
 ---
 apiVersion: policies.kyverno.io/v1
-kind: {{ if .Values.policyImageValidation.namespaced }}NamespacedImageValidatingPolicy{{ else }}ImageValidatingPolicy{{ end }}
+kind: {{ if .Values.policyImageSignatureVerification.namespaced }}NamespacedImageValidatingPolicy{{ else }}ImageValidatingPolicy{{ end }}
 metadata:
   name: require-verify-image-signatures
   annotations:
@@ -12,12 +12,12 @@ metadata:
     policies.kyverno.io/minversion: 1.18.0
 spec:
   validationActions:
-    {{- range (.Values.policyImageValidation.validationActions) }}
+    {{- range (.Values.policyImageSignatureVerification.validationActions) }}
     - {{ . }}
     {{- end }}
   evaluation:
     background:
-      enabled: {{ if hasKey .Values.policyImageValidation "background" }}{{ .Values.policyImageValidation.background }}{{ else }}true{{ end }}
+      enabled: {{ if hasKey .Values.policyImageSignatureVerification "background" }}{{ .Values.policyImageSignatureVerification.background }}{{ else }}true{{ end }}
   matchConstraints:
     resourceRules:
       - apiGroups:
@@ -29,18 +29,18 @@ spec:
           - UPDATE
         resources:
           - pods
-    {{- if and (not .Values.policyImageValidation.namespaced) .Values.policyImageValidation.excludedNamespaces }}
+    {{- if and (not .Values.policyImageSignatureVerification.namespaced) .Values.policyImageSignatureVerification.excludedNamespaces }}
     namespaceSelector:
       matchExpressions:
         - key: kubernetes.io/metadata.name
           operator: NotIn
           values:
-            {{- toYaml .Values.policyImageValidation.excludedNamespaces | nindent 12 }}
+            {{- toYaml .Values.policyImageSignatureVerification.excludedNamespaces | nindent 12 }}
     {{- end }}
-    {{- if .Values.policyImageValidation.excludedLabels }}
+    {{- if .Values.policyImageSignatureVerification.excludedLabels }}
     objectSelector:
       matchExpressions:
-      {{- range $key, $val := .Values.policyImageValidation.excludedLabels }}
+      {{- range $key, $val := .Values.policyImageSignatureVerification.excludedLabels }}
         - key: {{ $key }}
           operator: NotIn
           values:
@@ -49,7 +49,7 @@ spec:
     {{- end }}
 
   matchImageReferences:
-  {{- range (.Values.policyImageValidation.matchImageReferences) }}
+  {{- range (.Values.policyImageSignatureVerification.matchImageReferences) }}
     - {{ . }}
   {{- end }}
 
@@ -57,40 +57,48 @@ spec:
     - name: cosign-verification-enabled
       expression: >-
         has(object.metadata.annotations) &&
-        {{ .Values.policyImageValidation.cosign.annotations.verify | quote }}
+        {{ .Values.policyImageSignatureVerification.cosign.annotations.verify | quote }}
           in object.metadata.annotations &&
         object.metadata.annotations[
-          {{ .Values.policyImageValidation.cosign.annotations.verify | quote }}
+          {{ .Values.policyImageSignatureVerification.cosign.annotations.verify | quote }}
         ] == "true"
 
   variables:
-    - name: signingKeyConfigName
+    - name: signingKeyResourceName
       expression: >-
         has(object.metadata.annotations) &&
-        {{ .Values.policyImageValidation.cosign.annotations.keyConfigMap | quote }}
+        {{ .Values.policyImageValidation.cosign.annotations.keyResource | quote }}
           in object.metadata.annotations &&
         object.metadata.annotations[
-          {{ .Values.policyImageValidation.cosign.annotations.keyConfigMap | quote }}
-        ] in {{ .Values.policyImageValidation.cosign.allowedKeyConfigMaps | toJson }}
+          {{ .Values.policyImageValidation.cosign.annotations.keyResource | quote }}
+        ] in {{ .Values.policyImageValidation.cosign.allowedKeyResources | toJson }}
         ? object.metadata.annotations[
-            {{ .Values.policyImageValidation.cosign.annotations.keyConfigMap | quote }}
+            {{ .Values.policyImageValidation.cosign.annotations.keyResource | quote }}
           ]
-        : {{ .Values.policyImageValidation.cosign.defaultKeyConfigMap | quote }}
+        : {{ .Values.policyImageValidation.cosign.defaultKeyResource | quote }}
 
-    - name: signingKeyConfig
+    - name: signingKeyResource
       expression: >-
         resource.Get(
           "v1",
-          "configmaps",
+          {{ if eq .Values.policyImageValidation.cosign.keyResourceType "Secret" }}"secrets"{{ else }}"configmaps"{{ end }},
           object.metadata.namespace,
-          variables.signingKeyConfigName
+          variables.signingKeyResourceName
         )
+
+    - name: signingPublicKey
+      expression: >-
+        {{- if eq .Values.policyImageValidation.cosign.keyResourceType "Secret" }}
+        base64.decode(variables.signingKeyResource.data.pubKey)
+        {{- else }}
+        variables.signingKeyResource.data.pubKey
+        {{- end }}
 
   attestors:
     - name: cosign
       cosign:
         key:
-          expression: variables.signingKeyConfig.data.pubKey
+          expression: variables.signingPublicKey
 
   validations:
     - expression: >-

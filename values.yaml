@@ -109,7 +109,7 @@ policyDisallowLatestTag:
   #   allow-root: "yes"
   # background: false
 
-policyImageValidation:
+policyImageSignatureVerification:
   # if namespaced: true, this policy needs to be deployed within the target namespace
   namespaced: false
   # Audit, Warn, Enforce
@@ -127,9 +127,10 @@ policyImageValidation:
   matchImageReferences:
     - glob: '*'
   cosign:
-    defaultKeyConfigMap: cosign-public-key
+    keyResourceType: ConfigMap # ConfigMap oder Secret
+    defaultKeyResource: cosign-public-key
     annotations:
       verify: security.telekom-mms/verify-cosign
-      keyConfigMap: security.telekom-mms/cosign-key-configmap
-    allowedKeyConfigMaps:
+      keyResource: security.telekom-mms/cosign-key-configmap
+    allowedKeyResources:
       - cosign-public-key
