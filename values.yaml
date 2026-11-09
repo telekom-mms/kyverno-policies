@@ -127,10 +127,13 @@ policyImageSignatureVerification:
   matchImageReferences:
     - glob: '*'
   cosign:
-    keyResourceType: ConfigMap # ConfigMap oder Secret
+    keyResourceType: ConfigMap   # ConfigMap oder Secret
     defaultKeyResource: cosign-public-key
     annotations:
       verify: security.telekom-mms/verify-cosign
       keyResource: security.telekom-mms/cosign-key-configmap
     allowedKeyResources:
       - cosign-public-key
+  ctlog:
+    insecureIgnoreTlog: false
+    insecureIgnoreSCT: false

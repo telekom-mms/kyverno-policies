@@ -26,6 +26,7 @@ includePolicies:
   - require-requests-limits
   - disallow-latest-tag
   - require-verify-image-signatures
+  - require-verify-scan-results
 
 policyRunAsNonRoot:
   validationActions:

@@ -67,28 +67,28 @@ spec:
     - name: signingKeyResourceName
       expression: >-
         has(object.metadata.annotations) &&
-        {{ .Values.policyImageValidation.cosign.annotations.keyResource | quote }}
+        {{ .Values.policyImageSignatureVerification.cosign.annotations.keyResource | quote }}
           in object.metadata.annotations &&
         object.metadata.annotations[
-          {{ .Values.policyImageValidation.cosign.annotations.keyResource | quote }}
-        ] in {{ .Values.policyImageValidation.cosign.allowedKeyResources | toJson }}
+          {{ .Values.policyImageSignatureVerification.cosign.annotations.keyResource | quote }}
+        ] in {{ .Values.policyImageSignatureVerification.cosign.allowedKeyResources | toJson }}
         ? object.metadata.annotations[
-            {{ .Values.policyImageValidation.cosign.annotations.keyResource | quote }}
+            {{ .Values.policyImageSignatureVerification.cosign.annotations.keyResource | quote }}
           ]
-        : {{ .Values.policyImageValidation.cosign.defaultKeyResource | quote }}
+        : {{ .Values.policyImageSignatureVerification.cosign.defaultKeyResource | quote }}
 
     - name: signingKeyResource
       expression: >-
         resource.Get(
           "v1",
-          {{ if eq .Values.policyImageValidation.cosign.keyResourceType "Secret" }}"secrets"{{ else }}"configmaps"{{ end }},
+          {{ if eq .Values.policyImageSignatureVerification.cosign.keyResourceType "Secret" }}"secrets"{{ else }}"configmaps"{{ end }},
           object.metadata.namespace,
           variables.signingKeyResourceName
         )
 
     - name: signingPublicKey
       expression: >-
-        {{- if eq .Values.policyImageValidation.cosign.keyResourceType "Secret" }}
+        {{- if eq .Values.policyImageSignatureVerification.cosign.keyResourceType "Secret" }}
         base64.decode(variables.signingKeyResource.data.pubKey)
         {{- else }}
         variables.signingKeyResource.data.pubKey
@@ -99,6 +99,10 @@ spec:
       cosign:
         key:
           expression: variables.signingPublicKey
+      ctlog:
+      {{- range $key, $value := .Values.policyImageSignatureVerification.ctlog }}
+        {{ $key }}: {{ $value }}
+      {{- end }}
 
   validations:
     - expression: >-
